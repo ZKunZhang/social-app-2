@@ -43,7 +43,7 @@
 
 ### 后端
 - **框架**: Node.js + Express.js
-- **数据库**: SQLite (better-sqlite3)
+- **数据库**: SQLite (sql.js - 纯 JavaScript，无需编译)
 - **认证**: JWT (jsonwebtoken)
 - **密码加密**: bcryptjs
 - **验证**: express-validator

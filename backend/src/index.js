@@ -3,6 +3,7 @@ const cors = require('cors');
 const config = require('./config');
 const apiRoutes = require('./api');
 const { errorHandler, notFound } = require('./middleware/errorHandler');
+const { initDB, extendDatabase, closeDatabase } = require('./db/connection');
 
 const app = express();
 
@@ -68,26 +69,41 @@ app.use(errorHandler);
 
 const PORT = config.server.port;
 
-app.listen(PORT, () => {
-  console.log('\n========================================');
-  console.log('🚀 私密圈 API 服务已启动');
-  console.log(`📡 服务地址: http://localhost:${PORT}`);
-  console.log(`🌍 环境: ${config.server.env}`);
-  console.log(`📁 数据库: ${config.database.path}`);
-  console.log('========================================\n');
-});
+async function startServer() {
+  try {
+    // 初始化数据库
+    console.log('📦 正在初始化数据库...');
+    const db = await initDB();
+    extendDatabase(db);
+    console.log('✅ 数据库初始化成功\n');
+
+    // 启动服务器
+    app.listen(PORT, () => {
+      console.log('\n========================================');
+      console.log('🚀 私密圈 API 服务已启动');
+      console.log(`📡 服务地址: http://localhost:${PORT}`);
+      console.log(`🌍 环境: ${config.server.env}`);
+      console.log(`📁 数据库: ${config.database.path}`);
+      console.log('========================================\n');
+    });
+  } catch (error) {
+    console.error('❌ 服务器启动失败:', error);
+    process.exit(1);
+  }
+}
+
+// 启动服务器
+startServer();
 
 // 优雅关闭
 process.on('SIGINT', () => {
   console.log('\n👋 正在关闭服务器...');
-  const { closeDatabase } = require('./db/connection');
   closeDatabase();
   process.exit(0);
 });
 
 process.on('SIGTERM', () => {
   console.log('\n👋 正在关闭服务器...');
-  const { closeDatabase } = require('./db/connection');
   closeDatabase();
   process.exit(0);
 });

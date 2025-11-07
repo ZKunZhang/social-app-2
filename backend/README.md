@@ -17,7 +17,7 @@
 ## 🛠 技术栈
 
 - **框架**: Express.js 4.x
-- **数据库**: SQLite 3 (better-sqlite3)
+- **数据库**: SQLite 3 (sql.js - 纯 JavaScript 实现)
 - **认证**: JWT (jsonwebtoken)
 - **密码加密**: bcryptjs
 - **参数验证**: express-validator
