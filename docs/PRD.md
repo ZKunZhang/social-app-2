@@ -236,7 +236,7 @@ ELSE 显示锁定状态
 | | React Router v6 | 前端路由 |
 | | Axios | HTTP 客户端 |
 | **后端** | Node.js + Express | RESTful API 服务器 |
-| | better-sqlite3 | 轻量级数据库 |
+| | sql.js | 轻量级数据库（纯JavaScript实现） |
 | | JWT | 用户认证 |
 | | bcryptjs | 密码加密 |
 | **部署** | PM2 | 进程管理 |

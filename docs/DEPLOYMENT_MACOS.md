@@ -294,6 +294,8 @@ pnpm dev
 
 这会同时启动前端和后端服务（需要先安装根目录的 `concurrently` 依赖）。
 
+**注意**：前端默认运行在 `http://localhost:5100`（已从 5173 修改）。
+
 ---
 
 ## 5. 验证部署
@@ -303,10 +305,12 @@ pnpm dev
 打开浏览器，访问：
 
 ```
-http://localhost:5173
+http://localhost:5100
 ```
 
 应该看到登录页面。
+
+**注意**：前端端口已从 5173 改为 5100。
 
 ### 5.2 测试后端 API
 
@@ -435,7 +439,27 @@ SyntaxError: Unexpected token '?'
 brew upgrade node@20
 ```
 
-### 6.5 前端无法连接后端（CORS 错误）
+### 6.5 前端端口变更
+
+**说明**：项目前端端口已从 5173 改为 5100。
+
+如需修改，编辑 `frontend/vite.config.js`：
+
+```javascript
+export default defineConfig({
+  server: {
+    port: 5100,  // 修改为你需要的端口
+  },
+})
+```
+
+同时更新后端 `.env` 文件中的 CORS 配置：
+
+```env
+ALLOWED_ORIGINS=http://localhost:5173,http://localhost:5100,http://localhost:3000
+```
+
+### 6.6 前端无法连接后端（CORS 错误）
 
 **错误信息**（浏览器控制台）：
 
@@ -450,7 +474,7 @@ has been blocked by CORS policy
 2. 检查 Vite 代理配置（`frontend/vite.config.js`）
 3. 检查后端 CORS 配置（`backend/src/index.js`）
 
-### 6.6 热重载不工作
+### 6.7 热重载不工作
 
 **问题**：修改代码后页面不自动刷新
 
@@ -459,6 +483,24 @@ has been blocked by CORS policy
 - **后端**：检查 `nodemon` 是否正常工作
 - **前端**：检查 Vite 服务是否正常运行
 - 尝试手动刷新浏览器（Cmd + R）
+
+### 6.8 数据库初始化失败（sql.js 相关）
+
+**错误信息**：
+
+```
+Error: Database not initialized
+```
+
+**解决方案**：
+
+这是使用 sql.js 的正常行为。确保在使用数据库前调用了 `initDB()`：
+
+```javascript
+await initDB();  // 异步初始化
+```
+
+如果问题持续，删除 `main.db` 文件后重新运行 `pnpm db:init`。
 
 ---
 

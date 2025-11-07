@@ -145,7 +145,7 @@ pnpm dev
 
 #### 6. 访问应用
 
-打开浏览器访问: [http://localhost:5173](http://localhost:5173)
+打开浏览器访问: [http://localhost:5100](http://localhost:5100)
 
 ---
 

@@ -2,7 +2,7 @@
 
 ## 概述
 
-本项目使用 SQLite 作为数据库，通过 `better-sqlite3` 库进行操作。
+本项目使用 SQLite 作为数据库，通过 `sql.js` 库（纯 JavaScript 实现）进行操作。sql.js 是 SQLite 的 WebAssembly 移植版本，无需编译原生模块，具有跨平台兼容性。
 
 ## 表结构设计
 
@@ -243,6 +243,6 @@ WHERE f1.follower_id = :userId
 ## 安全性考虑
 
 1. **密码安全**：使用 bcryptjs 进行密码哈希（盐值自动生成）
-2. **SQL注入防护**：使用参数化查询（better-sqlite3 的 prepared statements）
+2. **SQL注入防护**：使用参数化查询（sql.js 的 prepared statements）
 3. **访问控制**：所有需要权限的API都需验证JWT Token
 4. **隐私保护**：严格执行"互关可见"规则，防止未授权访问

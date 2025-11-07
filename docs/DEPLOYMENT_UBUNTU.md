@@ -33,9 +33,13 @@ npm install -g pm2
 # Git
 sudo apt install -y git
 
-# SQLite (通常已安装)
+# SQLite (可选，用于数据库查看)
 sudo apt install -y sqlite3
 ```
+
+**技术栈说明**：
+
+本项目使用 **sql.js**（SQLite 的纯 JavaScript 实现），无需安装 SQLite 原生二进制文件或编译工具。sql.js 是跨平台的纯 JavaScript 解决方案，避免了 better-sqlite3 等原生模块的编译问题。
 
 ---
 
@@ -268,7 +272,140 @@ sudo tail -f /var/log/nginx/error.log
 
 ---
 
-## 8. 性能优化
+## 8. 常见问题
+
+### 8.1 数据库初始化失败（sql.js 相关）
+
+**错误信息**：
+
+```
+Error: Database not initialized
+```
+
+**解决方案**：
+
+这是使用 sql.js 的正常行为。确保在使用数据库前调用了 `initDB()`：
+
+```javascript
+await initDB();  // 异步初始化
+```
+
+如果问题持续，删除数据库文件后重新运行：
+
+```bash
+cd /var/www/forum/backend
+rm ../prod.db
+pnpm db:init
+```
+
+### 8.2 端口被占用
+
+**错误信息**：
+
+```
+Error: listen EADDRINUSE: address already in use :::3000
+```
+
+**解决方案**：
+
+查找占用端口的进程：
+
+```bash
+sudo lsof -i :3000
+```
+
+终止进程：
+
+```bash
+sudo kill -9 <PID>
+```
+
+或修改 `.env` 中的 `PORT` 为其他端口。
+
+### 8.3 前端开发端口说明
+
+**重要提示**：前端开发服务器端口已从默认的 5173 改为 5100。
+
+如需修改，编辑 `frontend/vite.config.js`：
+
+```javascript
+export default defineConfig({
+  server: {
+    port: 5100,  // 修改为你需要的端口
+  },
+})
+```
+
+同时更新后端 `.env` 中的 CORS 配置：
+
+```env
+ALLOWED_ORIGINS=http://localhost:5100,http://localhost:3000,https://your-domain.com
+```
+
+**生产环境无需此配置**，因为前端会构建为静态文件并通过 Nginx 提供服务。
+
+### 8.4 PM2 进程启动失败
+
+**错误信息**：
+
+```
+Error: Cannot find module 'xxx'
+```
+
+**解决方案**：
+
+确保在 production 模式下安装了所有依赖：
+
+```bash
+cd /var/www/forum/backend
+pnpm install --production
+pm2 restart forum-api
+```
+
+### 8.5 Nginx 502 Bad Gateway
+
+**可能原因**：
+
+1. 后端服务未启动
+2. 端口配置错误
+3. 防火墙阻止
+
+**解决方案**：
+
+```bash
+# 检查后端是否运行
+pm2 list
+
+# 检查后端日志
+pm2 logs forum-api
+
+# 检查 Nginx 配置
+sudo nginx -t
+
+# 查看 Nginx 错误日志
+sudo tail -f /var/log/nginx/error.log
+```
+
+### 8.6 数据库文件权限问题
+
+**错误信息**：
+
+```
+Error: EACCES: permission denied
+```
+
+**解决方案**：
+
+确保数据库文件有正确权限：
+
+```bash
+sudo chown -R $USER:$USER /var/www/forum
+chmod 644 /var/www/forum/prod.db
+```
+
+---
+
+## 9. 性能优化
 
 - 使用 PM2 cluster 模式
 - 启用 Nginx gzip 压缩
